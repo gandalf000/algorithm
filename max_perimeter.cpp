@@ -1,10 +1,12 @@
+#include <unistd.h>
+#include <assert.h>
 #include <iostream>                                                                                     
 #include <algorithm>                                                                                    
-#include <unistd.h>
 
 using namespace std;                                                                                    
 
 int SimpleGetMaxPerimeter(int* data, int len) {                                                         
+    assert(len >= 3);
     int perimeter = 0;                                                                                  
     for (int i = 0; i < len; ++i) {                                                                     
         for (int j = i + 1; j < len; ++j) {                                                             
@@ -32,7 +34,8 @@ int* binary_search(int* left, int* right, int value) {
     return left;          
 }
 
-int GetMaxPerimeter(int* data, int len) {                                                            
+int SubOptimalGetMaxPerimeter(int* data, int len) {                                                            
+    assert(len >= 3);
     int perimeter = 0;                                                                               
     std::sort(data, data+len);                                                                       
     for (int i = 0; i < len - 2; ++i) {                                                              
@@ -47,6 +50,23 @@ int GetMaxPerimeter(int* data, int len) {
     return perimeter;                                                                                
 }                                                                                                    
 
+bool Compare(int i, int j) {
+    return i > j;
+}
+
+int OptimalGetMaxPerimeter(int* data, int len) {
+    assert(len >= 3);
+    int result = 0;
+    std::sort(data, data + len, Compare);
+    for (int i = 0; i < len - 2; ++i) {
+       if (data[i] < data[i + 1] + data[i + 2]) {
+           result = data[i] + data[i + 1] + data[i + 2];
+           break;
+       }
+    }
+    return result;
+}
+
 int main(int argc, char** argv) {                                                                    
     srand(time(NULL));                                                                               
     while (true) {
@@ -56,7 +76,9 @@ int main(int argc, char** argv) {
             data[i] = rand() % 100 + 1;                                                                  
         }                                                                                                
         int result = SimpleGetMaxPerimeter(data, number);                                                
-        if (result != GetMaxPerimeter(data, number)) {
+        if (result != SubOptimalGetMaxPerimeter(data, number)) {
+            cerr << "triangle algorithm error"<< endl;
+        } else if (result != OptimalGetMaxPerimeter(data, number)) {
             cerr << "triangle algorithm error"<< endl;
         } else {
             cout << "max perimeter:" << result << endl;                                                      
